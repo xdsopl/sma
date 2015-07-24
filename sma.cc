@@ -86,12 +86,33 @@ public:
 		while (node != 1) {
 			int left = node & ~1;
 			int right = node | 1;
-			node = node / 2;
+			node /= 2;
 			tree[node] = tree[left] + tree[right];
 		}
 		return tree[1] / T(N);
 	}
 };
+
+template <typename SMA, typename T>
+int benchmark(T &output, T &input)
+{
+	SMA sma;
+	auto start = std::chrono::system_clock::now();
+	for (size_t i = 0; i < input.size(); ++i)
+		output[i] = sma(input[i]);
+	auto end = std::chrono::system_clock::now();
+	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	return msec.count();
+}
+
+template <typename T>
+typename T::value_type compare(T &a, T &b)
+{
+	typename T::value_type max_error(0);
+	for (size_t i = 0; i < a.size(); ++i)
+		max_error = std::max(max_error, std::abs(a[i] - b[i]));
+	return max_error;
+}
 
 int main()
 {
@@ -101,46 +122,20 @@ int main()
 	for (size_t i = 0; i < input.size(); ++i)
 		input[i] = sin(i * 4.0f * 2.0f * M_PI / num_samples) + myrand();
 	{
-		SMA1<float, window_length> sma1;
-		auto start = std::chrono::system_clock::now();
-		for (size_t i = 0; i < input.size(); ++i)
-			output1[i] = sma1(input[i]);
-		auto end = std::chrono::system_clock::now();
-		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		std::cerr << "sma1: " << msec.count() << " milliseconds." << std::endl;
+		int msec = benchmark<SMA1<float, window_length>>(output1, input);
+		std::cerr << "sma1: " << msec << " milliseconds." << std::endl;
 	}{
-		SMA2<float, window_length> sma2;
-		auto start = std::chrono::system_clock::now();
-		for (size_t i = 0; i < input.size(); ++i)
-			output2[i] = sma2(input[i]);
-		auto end = std::chrono::system_clock::now();
-		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		float max_error = 0.0f;
-		for (size_t i = 0; i < input.size(); ++i)
-			max_error = std::max(max_error, std::abs(output1[i] - output2[i]));
-		std::cerr << "sma2: " << msec.count() << " milliseconds. max absolute error: " << max_error << std::endl;
+		int msec = benchmark<SMA2<float, window_length>>(output2, input);
+		float max_error = compare(output1, output2);
+		std::cerr << "sma2: " << msec << " milliseconds. max absolute error: " << max_error << std::endl;
 	}{
-		SMA3<float, window_length> sma3;
-		auto start = std::chrono::system_clock::now();
-		for (size_t i = 0; i < input.size(); ++i)
-			output3[i] = sma3(input[i]);
-		auto end = std::chrono::system_clock::now();
-		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		float max_error = 0.0f;
-		for (size_t i = 0; i < input.size(); ++i)
-			max_error = std::max(max_error, std::abs(output1[i] - output3[i]));
-		std::cerr << "sma3: " << msec.count() << " milliseconds. max absolute error: " << max_error << std::endl;
+		int msec = benchmark<SMA3<float, window_length>>(output3, input);
+		float max_error = compare(output1, output3);
+		std::cerr << "sma3: " << msec << " milliseconds. max absolute error: " << max_error << std::endl;
 	}{
-		SMA4<float, window_length> sma4;
-		auto start = std::chrono::system_clock::now();
-		for (size_t i = 0; i < input.size(); ++i)
-			output4[i] = sma4(input[i]);
-		auto end = std::chrono::system_clock::now();
-		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		float max_error = 0.0f;
-		for (size_t i = 0; i < input.size(); ++i)
-			max_error = std::max(max_error, std::abs(output1[i] - output4[i]));
-		std::cerr << "sma4: " << msec.count() << " milliseconds. max absolute error: " << max_error << std::endl;
+		int msec = benchmark<SMA4<float, window_length>>(output4, input);
+		float max_error = compare(output1, output4);
+		std::cerr << "sma4: " << msec << " milliseconds. max absolute error: " << max_error << std::endl;
 	}
 #if 1
 	for (size_t i = 0; i < input.size(); ++i)
