@@ -56,11 +56,28 @@ public:
 template <typename T, int N>
 class SMA3
 {
+	std::vector<T> history;
+	int position;
+	Kahan<T> sum;
+public:
+	SMA3() : history(N), position(0), sum(0) {}
+	T operator ()(T v)
+	{
+		sum(-history[position]);
+		history[position] = v;
+		position = (position + 1) % N;
+		return sum(v) / T(N);
+	}
+};
+
+template <typename T, int N>
+class SMA4
+{
 	std::vector<T> tree;
 	int position;
 public:
 	// 2 * N and indexing from 1 on purpose: simpler code
-	SMA3() : tree(2 * N), position(0) {}
+	SMA4() : tree(2 * N), position(0) {}
 	T operator ()(T v)
 	{
 		int node = position + N;
@@ -79,7 +96,7 @@ public:
 int main()
 {
 	const int num_samples = 10000000;
-	std::vector<float> input(num_samples), output1(num_samples), output2(num_samples), output3(num_samples);
+	std::vector<float> input(num_samples), output1(num_samples), output2(num_samples), output3(num_samples), output4(num_samples);
 	const int window_length = 500;
 	for (size_t i = 0; i < input.size(); ++i)
 		input[i] = 1000.0f * (sin(i * 4.0f * 2.0f * M_PI / num_samples) + myrand());
@@ -113,10 +130,21 @@ int main()
 		for (size_t i = 0; i < input.size(); ++i)
 			max_error = std::max(max_error, std::abs(output1[i] - output3[i]));
 		std::cerr << "sma3: " << msec.count() << " milliseconds. max absolute error: " << max_error << std::endl;
+	}{
+		SMA4<float, window_length> sma4;
+		auto start = std::chrono::system_clock::now();
+		for (size_t i = 0; i < input.size(); ++i)
+			output4[i] = sma4(input[i]);
+		auto end = std::chrono::system_clock::now();
+		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		float max_error = 0.0f;
+		for (size_t i = 0; i < input.size(); ++i)
+			max_error = std::max(max_error, std::abs(output1[i] - output4[i]));
+		std::cerr << "sma4: " << msec.count() << " milliseconds. max absolute error: " << max_error << std::endl;
 	}
 #if 1
 	for (size_t i = 0; i < input.size(); ++i)
-		std::cout << input[i] << " " << output1[i] << " " << output2[i] << " " << output2[i] << std::endl;
+		std::cout << input[i] << " " << output1[i] << " " << output2[i] << " " << output3[i] << " " << output4[i] << std::endl;
 #endif
 }
 
