@@ -1,0 +1,27 @@
+sma - simple moving average
+Written in 2015 by <Ahmet Inan> <xdsopl@googlemail.com>
+To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. This software is distributed without any warranty.
+You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+SMA1 is the well known implementation using a ring buffer but very slow:
+O(N * W) where N is the number of samples to process and W the window length in number of samples.
+Here we even use Kahan summation for a better reference.
+
+SMA2 uses an O(N) algorithm which works fantastic for integers but will give growing rounding errors with floating points.
+Especially with very long sequences you might want to reinit with SMA1 from time to time to keep errors minimal if you still want to use SMA2.
+
+SMA3 uses an O(N * log(W)) divide and conquer algorithm and does not suffer from the growing rounding errors like SMA2 does.
+
+# ./sma > blah.dat
+sma1: 15331 milliseconds.
+sma2: 33 milliseconds. max absolute error: 0.12439
+sma3: 150 milliseconds. max absolute error: 0.000244141
+
+# gnuplot
+gnuplot> set term x11
+Terminal type set to 'x11'
+Options are ' nopersist'
+gnuplot> plot "blah.dat" u 1 w d, "blah.dat" u 2 w d
+
+The result you can see in gnuplot.png
+
