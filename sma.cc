@@ -99,7 +99,7 @@ int main()
 	std::vector<float> input(num_samples), output1(num_samples), output2(num_samples), output3(num_samples), output4(num_samples);
 	const int window_length = 500;
 	for (size_t i = 0; i < input.size(); ++i)
-		input[i] = 1000.0f * (sin(i * 4.0f * 2.0f * M_PI / num_samples) + myrand());
+		input[i] = sin(i * 4.0f * 2.0f * M_PI / num_samples) + myrand();
 	{
 		SMA1<float, window_length> sma1;
 		auto start = std::chrono::system_clock::now();

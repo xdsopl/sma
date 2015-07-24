@@ -18,10 +18,10 @@ SMA4 uses an O(N * log(W)) divide and conquer algorithm and does not suffer from
 following example with num_samples = 100000000 and window_length = 500:
 
 # ./sma > blah.dat
-sma1: 151416 milliseconds.
-sma2: 326 milliseconds. max absolute error: 0.245605
-sma3: 620 milliseconds. max absolute error: 0.0012207
-sma4: 1506 milliseconds. max absolute error: 0.000244141
+sma1: 151101 milliseconds.
+sma2: 322 milliseconds. max absolute error: 0.000230014
+sma3: 618 milliseconds. max absolute error: 7.15256e-07
+sma4: 1501 milliseconds. max absolute error: 3.57628e-07
 
 # gnuplot
 gnuplot> set term x11
