@@ -11,6 +11,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 #include <array>
 #include <numeric>
 #include "kahan.hh"
+#include "pairwise.hh"
 
 std::random_device rd;
 std::default_random_engine generator(rd());
@@ -73,23 +74,18 @@ public:
 template <typename T, int N>
 class SMA4
 {
-	std::vector<T> tree;
+	struct add {
+		T operator () (T l, T r) { return l + r; }
+	};
+	Pairwise<T, N, add> pairwise;
 	int position;
 public:
-	// 2 * N and indexing from 1 on purpose: simpler code
-	SMA4() : tree(2 * N), position(0) {}
+	SMA4() : position(0) {}
 	T operator ()(T v)
 	{
-		int node = position + N;
+		pairwise[position] = v;
 		position = (position + 1) % N;
-		tree[node] = v;
-		while (node != 1) {
-			int left = node & ~1;
-			int right = node | 1;
-			node /= 2;
-			tree[node] = tree[left] + tree[right];
-		}
-		return tree[1] / T(N);
+		return pairwise.reduce() / T(N);
 	}
 };
 
