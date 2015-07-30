@@ -77,15 +77,15 @@ class SMA4
 	struct add {
 		T operator () (T l, T r) { return l + r; }
 	};
-	Pairwise<T, N, add> pairwise;
+	Pairwise<T, N, add> history;
 	int position;
 public:
 	SMA4() : position(0) {}
 	T operator ()(T v)
 	{
-		pairwise[position] = v;
+		history[position] = v;
 		position = (position + 1) % N;
-		return pairwise.reduce() / T(N);
+		return history.reduce() / T(N);
 	}
 };
 
