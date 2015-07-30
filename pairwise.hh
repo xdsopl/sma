@@ -15,6 +15,7 @@ class Pairwise
 	size_t node;
 	OPERATOR op;
 public:
+	typedef TYPE value_type;
 	// 2 * N and indexing from 1 on purpose: simpler code
 	Pairwise() : tree(2 * SIZE), node(1) {}
 	TYPE &operator [] (size_t i)
