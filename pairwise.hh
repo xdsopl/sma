@@ -8,7 +8,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 #ifndef PAIRWISE_HH
 #define PAIRWISE_HH
 
-template <typename TYPE, int SIZE, typename OPERATOR>
+template <typename TYPE, size_t SIZE, typename OPERATOR>
 class Pairwise
 {
 	std::vector<TYPE> tree;
