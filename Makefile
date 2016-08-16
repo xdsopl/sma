@@ -1,6 +1,7 @@
 
-CXXFLAGS = -stdlib=libc++ -std=c++11 -W -Wall -O3 -march=native
-CXX = clang++
+CXXFLAGS = -std=c++11 -W -Wall -O3 -march=native -ffast-math
+CXX = clang++ -stdlib=libc++
+#CXX = g++
 
 sma: sma.cc
 

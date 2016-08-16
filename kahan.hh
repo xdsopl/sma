@@ -15,6 +15,13 @@ class Kahan
 public:
 	Kahan() : high(0), low(0) {}
 	Kahan(T init) : high(init), low(0) {}
+#if __clang__
+	[[clang::optnone]]
+#elif __GNUC__
+	[[gnu::optimize("no-associative-math")]]
+#else
+#error unsupported compiler
+#endif
 	T operator ()(T input)
 	{
 		T tmp = input - low;
